@@ -1,0 +1,150 @@
+\documentclass{article}
+
+
+\usepackage{tikz} 
+\usetikzlibrary{automata, positioning, arrows} 
+
+\usepackage{array}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{fullpage}
+\usepackage{color}
+\usepackage{parskip}
+\usepackage{hyperref}
+  \hypersetup{
+    colorlinks = true,
+    urlcolor = blue,       % color of external links using \href
+    linkcolor= blue,       % color of internal links 
+    citecolor= blue,       % color of links to bibliography
+    filecolor= blue,        % color of file links
+    }
+    
+\usepackage{listings}
+\usepackage[utf8]{inputenc}                                                    
+\usepackage[T1]{fontenc}                                                       
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=haskell,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\newtheoremstyle{theorem}
+  {\topsep}   % ABOVESPACE
+  {\topsep}   % BELOWSPACE
+  {\itshape\/}  % BODYFONT
+  {0pt}       % INDENT (empty value is the same as 0pt)
+  {\bfseries} % HEADFONT
+  {.}         % HEADPUNCT
+  {5pt plus 1pt minus 1pt} % HEADSPACE
+  {}          % CUSTOM-HEAD-SPEC
+\theoremstyle{theorem} 
+   \newtheorem{theorem}{Theorem}[section]
+   \newtheorem{corollary}[theorem]{Corollary}
+   \newtheorem{lemma}[theorem]{Lemma}
+   \newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+   \newtheorem{definition}[theorem]{Definition}
+   \newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}    
+  \newtheorem{remark}[theorem]{Remark}
+
+\title{CPSC-354 Report}
+\author{ Angelina House  \\ Chapman University}
+
+\date{\today} 
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This report documents my learning and progress throughout the Fall 2025 semester in CPSC-354: Programming Languages. 
+\end{abstract}
+
+\setcounter{tocdepth}{3}
+\tableofcontents
+
+
+\section{Introduction}\label{intro}
+
+This report chronicles my work in CPSC-354: Programming Languages during Fall 2025. Each weekly subsection contains restated homework prompts, fully typeset solutions, and a brief reflection or question that ties the technical material to broader themes.
+
+
+
+\section{Week by Week}\label{homework}
+
+\subsection{Week 1}\label{sec:week1}
+\smallskip
+
+\subsection*{Homework}
+Discuss the MU puzzle from \emph{Gödel, Escher, Bach} (Chapter 1; see course PDF pp.~41--42). Does the string \texttt{MU} have a derivation in the MIU formal system starting from \texttt{MI}? Why or why not?
+
+\subsubsection*{The MU (MIU) System Recap}
+We begin with the single axiom string \texttt{MI}. The system has four production rules:
+\begin{enumerate}
+  \item If a string ends in \texttt{I}, append a \texttt{U} at the end.
+  \item If the string has the form \texttt{M}x, duplicate everything after \texttt{M}: \texttt{M}x $\to$ \texttt{M}xx.
+  \item Replace any occurrence of \texttt{III} by \texttt{U}.
+  \item Delete any occurrence of \texttt{UU}.
+\end{enumerate}
+
+From \texttt{MI}, we can derive many strings by applying the rules:
+\[
+\texttt{MI} \xRightarrow{(2)} \texttt{MII} \xRightarrow{(2)} \texttt{MIIII} \xRightarrow{(3)} \texttt{MUI}.
+\]
+This illustrates how the rules expand and compress substrings, but it remains unclear how to end with exactly \texttt{MU}.
+
+Let $I(s)$ be the number of \texttt{I}'s in a string $s$. Initially, $I(\texttt{MI})=1$, i.e., $1\ (\mathrm{mod}\ 3)$. Examine how each rule affects $I$ modulo $3$:
+\begin{itemize}
+  \item Rule 1 adds a \texttt{U}; $I$ is unchanged.
+  \item Rule 2 doubles the count of \texttt{I}'s: $I \mapsto 2I$. Thus if $I \equiv 1\pmod{3}$ then $2I \equiv 2\pmod{3}$.
+  \item Rule 3 subtracts three \texttt{I}'s (\texttt{III} $\to$ \texttt{U}); the residue modulo $3$ is unchanged.
+  \item Rule 4 deletes \texttt{U}'s only; $I$ is unchanged.
+\end{itemize}
+Therefore, starting from $I \equiv 1\pmod{3}$, any derivable string keeps $I \equiv 1$ or $I \equiv 2\pmod{3}$, but never $0\pmod{3}$. The target \texttt{MU} has $I(\texttt{MU})=0$ ($0\pmod{3}$), so it is \emph{not} derivable. Hence, the MU puzzle has no solution.
+
+The puzzle shows how stepping outside a formal system and using an invariant (here, the count of \texttt{I}'s modulo 3) can decisively answer a reachability question that seems open-ended from within the rules.
+
+\subsubsection*{Reading Summary \& Question}
+\textbf{Summary.} Hofstadter introduces formal systems via the MIU puzzle and contrasts \emph{inside-the-system} rule manipulation with \emph{meta-level} reasoning using invariants. This frames later topics on meaning, proof, and limitations of formal systems.
+
+\textbf{Question.} Are there any situations where the MU puzzle could be true, and how much would we have to change to get to that point?
+
+
+
+
+%  end of semester work  
+
+\section{Synthesis}
+
+
+\section{Evidence of Participation}
+
+
+\section{Conclusion}\label{conclusion}
+
+
+\begin{thebibliography}{99}
+
+
+\end{thebibliography}
+
+\end{document}
