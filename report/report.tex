@@ -2,6 +2,7 @@
 
 
 \usepackage{tikz} 
+\usepackage{tikz-cd}
 \usetikzlibrary{automata, positioning, arrows} 
 
 \usepackage{array}
@@ -128,9 +129,110 @@ The puzzle shows how stepping outside a formal system and using an invariant (he
 
 \textbf{Question.} Are there any situations where the MU puzzle could be true, and how much would we have to change to get to that point?
 
+\subsection{Week 2}\label{sec:week2}
+\smallskip
 
+\subsection*{Homework}
+Using the course notes on abstract reduction systems (ARS), determine for each of the seven given ARSs whether it is \emph{terminating}, \emph{confluent}, and whether it \emph{has unique normal forms (UN)}. Then, fill the grid of the eight possible \((\text{Confluent}, \text{Terminating}, \text{Has UN})\) combinations with examples or explain why some combinations are impossible.
 
+\subsubsection*{Quick Definitions}
+\begin{itemize}
+  \item \textbf{Terminating:} there is no infinite chain \(x_0 \to x_1 \to x_2 \to \cdots\).
+  \item \textbf{Confluent:} if \(x \to^* y\) and \(x \to^* z\), then \(y\) and \(z\) are joinable.
+  \item \textbf{Has unique normal forms (UN):} every element has a (and in fact the) unique normal form.
+\end{itemize}
 
+\subsubsection*{Seven ARSs: Diagrams \& Properties}
+Below, each ARS is shown as a tiny diagram (compiled with \texttt{tikz-cd}) followed by its properties and a one–line justification.
+
+\paragraph{1) \(A=\varnothing\).}
+\[
+\text{(empty set, no nodes or arrows)}
+\]
+\textbf{Props:} Terminating \(\checkmark\), Confluent \(\checkmark\), UN \(\checkmark\). \emph{Reason:} All properties hold vacuously.
+
+\paragraph{2) \(A=\{a\},\ R=\varnothing\).}
+\[
+\begin{tikzcd}
+a
+\end{tikzcd}
+\]
+\textbf{Props:} Terminating \(\checkmark\), Confluent \(\checkmark\), UN \(\checkmark\). \emph{Reason:} No arrows; \(a\) is a (unique) normal form.
+
+\paragraph{3) \(A=\{a\},\ R=\{(a,a)\}\).}
+\[
+\begin{tikzcd}
+a \arrow[out=45,in=135,loop, ""]
+\end{tikzcd}
+\]
+\textbf{Props:} Terminating \(\times\), Confluent \(\checkmark\), UN \(\times\). \emph{Reason:} Self–loop gives infinite chain; only one object so forks (if any) are trivially joinable; no normal form exists.
+
+\paragraph{4) \(A=\{a,b,c\},\ R=\{(a,b),(a,c)\}\).}
+\[
+\begin{tikzcd}
+& a \arrow[dl] \arrow[dr] & \\
+b & & c
+\end{tikzcd}
+\]
+\textbf{Props:} Terminating \(\checkmark\), Confluent \(\times\), UN \(\times\). \emph{Reason:} From \(a\) reach distinct NFs \(b\) and \(c\) that are not joinable.
+
+\paragraph{5) \(A=\{a,b\},\ R=\{(a,a),(a,b)\}\).}
+\[
+\begin{tikzcd}
+a \arrow[loop left] \arrow[r] & b
+\end{tikzcd}
+\]
+\textbf{Props:} Terminating \(\times\), Confluent \(\checkmark\), UN \(\checkmark\). \emph{Reason:} There exists an infinite chain via the loop on \(a\), but all reductions from \(a\) can join at \(b\), and every element’s normal form is uniquely \(b\).
+
+\paragraph{6) \(A=\{a,b,c\},\ R=\{(a,b),(b,b),(a,c)\}\).}
+\[
+\begin{tikzcd}
+& a \arrow[dl] \arrow[dr] & \\
+b \arrow[loop left] & & c
+\end{tikzcd}
+\]
+\textbf{Props:} Terminating \(\times\), Confluent \(\times\), UN \(\times\). \emph{Reason:} Loop at \(b\) breaks termination; from \(a\) you can reach \(b\) (non–NF forever) or \(c\) (an NF), so confluence and UN fail.
+
+\paragraph{7) \(A=\{a,b,c\},\ R=\{(a,b),(b,b),(a,c),(c,c)\}\).}
+\[
+\begin{tikzcd}
+& a \arrow[dl] \arrow[dr] & \\
+b \arrow[loop left] & & c \arrow[loop right]
+\end{tikzcd}
+\]
+\textbf{Props:} Terminating \(\times\), Confluent \(\times\), UN \(\times\). \emph{Reason:} Loops at \(b\) and \(c\); from \(a\) diverge to non–joinable loops; no normal forms.
+
+\subsubsection*{Summary Table (Seven ARSs)}
+\[
+\begin{array}{c|c|c|c|l}
+\# & \text{Terminating} & \text{Confluent} & \text{Has UN} & \text{Quick reason} \\\hline
+1 & \checkmark & \checkmark & \checkmark & \text{Empty set: vacuous} \\
+2 & \checkmark & \checkmark & \checkmark & \text{Single node, no edges} \\
+3 & \times & \checkmark & \times & \text{Self–loop; no NF} \\
+4 & \checkmark & \times & \times & a\to b\ \text{or}\ a\to c\ \text{(two NFs)} \\
+5 & \times & \checkmark & \checkmark & \text{Loop at }a\ \text{but unique NF }b \\
+6 & \times & \times & \times & \text{Loop at }b;\ a\to b\ \text{vs }a\to c \\
+7 & \times & \times & \times & \text{Loops at }b,c;\ a\to b\ \text{vs }a\to c \\
+\end{array}
+\]
+
+\subsubsection*{Eight Combinations Grid}
+\[
+\begin{array}{c|c|c|l}
+\text{Confluent} & \text{Terminating} & \text{Has UN} & \text{Example or reason} \\\hline
+\text{T} & \text{T} & \text{T} & \text{Example \#2 (or \#1)} \\
+\text{T} & \text{T} & \text{F} & \textbf{Impossible:}\ \text{Confluence+termination}\Rightarrow\text{unique NF} \\
+\text{T} & \text{F} & \text{T} & \text{Example \#5} \\
+\text{T} & \text{F} & \text{F} & \text{Example \#3} \\
+\text{F} & \text{T} & \text{T} & \textbf{Impossible:}\ \text{UN in a terminating system}\Rightarrow\text{confluent} \\
+\text{F} & \text{T} & \text{F} & \text{Example \#4} \\
+\text{F} & \text{F} & \text{T} & \textbf{Impossible:}\ \text{UN (for all elements)}\Rightarrow\text{confluent} \\
+\text{F} & \text{F} & \text{F} & \text{Example \#6 or \#7} \\
+\end{array}
+\]
+
+\subsubsection*{Reflection \& Question}
+\textbf{Question.} What is a real life example of something that has two possible end states like in ARS \#4 where $a$ can go to either $b$ or $c$?
 %  end of semester work  
 
 \section{Synthesis}
