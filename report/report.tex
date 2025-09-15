@@ -233,7 +233,75 @@ b \arrow[loop left] & & c \arrow[loop right]
 
 \subsubsection*{Reflection \& Question}
 \textbf{Question.} What is a real life example of something that has two possible end states like in ARS \#4 where $a$ can go to either $b$ or $c$?
+
+\subsection{Week 3}\label{sec:week3}
+\smallskip
+
+\subsection*{Homework}
+
+\subsubsection*{Exercise 5 — Analysis}
+\textbf{Rules:}
+\[
+\texttt{ab}\to\texttt{ba},\quad \texttt{ba}\to\texttt{ab},\quad \texttt{aa}\to\varepsilon.
+\]
+
+\paragraph{Sample reductions.}
+\[
+\texttt{abba}\;\Rightarrow\;\texttt{baba}\;\xRightarrow{\texttt{ba}\to\texttt{ab}}\;\texttt{bbaa}\;\xRightarrow{\texttt{aa}\to\varepsilon}\;\texttt{bb}.
+\]
+\[
+\texttt{bababa}\;\Rightarrow\;\texttt{aaabbb}\;\xRightarrow{\texttt{aa}\to\varepsilon}\;\texttt{abbb}.
+\]
+
+\paragraph{Non-termination.}
+Swaps are bidirectional, so we can permute letters indefinitely; the ARS is not terminating.
+
+\paragraph{Equivalence classes \& invariant.}
+Swaps preserve counts of letters. The rule \texttt{aa}$\to\varepsilon$ preserves \(\#a \pmod 2\).  
+Thus the complete invariant is
+\[
+\big(\#\texttt{b},\;\#\texttt{a}\bmod 2\big).
+\]
+
+\paragraph{Normal forms via terminating variant.}
+If we orient swaps one way (e.g.\ \texttt{ba}$\to$\texttt{ab}) and keep \texttt{aa}$\to\varepsilon$, then every word terminates in a unique normal form:
+\[
+\texttt{b}^k \quad(\#a \text{ even}), \qquad \texttt{a}\,\texttt{b}^k \quad(\#a \text{ odd}),
+\]
+where \(k=\#\texttt{b}\).
+
+\subsubsection*{Exercise 5b — Analysis}
+\textbf{Rules (variant):}
+\[
+\texttt{ab}\to\texttt{ba},\quad \texttt{ba}\to\texttt{ab},\quad \texttt{aa}\to\texttt{a}.
+\]
+
+\paragraph{Non-termination.}
+Still non-terminating because of two-way swaps.
+
+\paragraph{Equivalence classes \& invariant.}
+Swaps preserve \(\#\texttt{b}\). The rule \texttt{aa}$\to\texttt{a}\) collapses any number of \texttt{a}’s to exactly one (and in the equivalence closure we can also expand).  
+Thus classes are determined by
+\[
+\big(\#\texttt{b},\;\mathbf{1}_{\{\#a\ge 1\}}\big),
+\]
+i.e.\ the number of \texttt{b}\,s and whether there is at least one \texttt{a}.
+
+\paragraph{Normal forms via terminating variant.}
+If we orient \texttt{ba}$\to$\texttt{ab} and keep \texttt{aa}$\to\texttt{a}, then the unique normal forms are:
+\[
+\texttt{b}^k \quad(\#a=0), \qquad \texttt{a}\,\texttt{b}^k \quad(\#a\ge 1),
+\]
+with \(k=\#\texttt{b}\).
+
+\subsubsection*{Reflection \& Question}
+\textbf{Question.} In example 5b every word with at least one a collapses to the same class. 
+Does this mean aaa and a are always equivalent in both directions or only in the equivalence closure?
+
+
 %  end of semester work  
+
+
 
 \section{Synthesis}
 
