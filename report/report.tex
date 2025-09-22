@@ -298,7 +298,57 @@ with \(k=\#\texttt{b}\).
 \textbf{Question.} In example 5b every word with at least one a collapses to the same class. 
 Does this mean aaa and a are always equivalent in both directions or only in the equivalence closure?
 
+\subsection{Week 4}\label{sec:week4}
+\subsection*{Homework}
+Using a measure function (from the termination notes), prove termination of (1) Euclid’s algorithm for \(\gcd(a,b)\) and (2) a standard top-down merge sort.
 
+\subsubsection*{HW 4.1 — Euclid’s Algorithm Terminates}
+\textbf{Algorithm.}
+\begin{verbatim}
+while b != 0:
+    temp = b
+    b = a mod b
+    a = temp
+return a
+\end{verbatim}
+
+\textbf{Assumptions.} \(a,b \in \mathbb{N}\) and the loop guard is first checked with \(b \ge 0\).
+
+\textbf{Measure.} \(\phi(a,b) = b \in \mathbb{N}\).
+
+\textbf{Proof.} One loop step maps \((a,b)\) to \((b,\, a \bmod b)\). If \(b \neq 0\), then \(0 \le a \bmod b < b\), hence
+\[
+\phi(b,\, a \bmod b) = a \bmod b \;<\; b \;=\; \phi(a,b).
+\]
+Thus \(\phi\) strictly decreases at each taken iteration and always stays in \(\mathbb{N}\). Since \(>\) on \(\mathbb{N}\) is well-founded, there is no infinite strictly decreasing chain; the loop terminates when \(b=0\).
+
+\subsubsection*{HW 4.2 — Merge Sort Terminates}
+\textbf{Code (top-down).}
+\begin{verbatim}
+function merge_sort(arr, left, right):
+    if left >= right: return
+    mid = (left + right) // 2   // integer division
+    merge_sort(arr, left, mid)
+    merge_sort(arr, mid+1, right)
+    merge(arr, left, mid, right)
+\end{verbatim}
+
+\textbf{Measure.} For a call on interval \([left,right]\), let
+\[
+\phi(left,right) \;=\; right - left + 1 \in \mathbb{N}.
+\]
+
+\textbf{Proof.} If \(left \ge right\), the function returns immediately. Otherwise \(left < right\) and with integer division \(left \le mid < right\). The recursive calls are on \([left,\,mid]\) and \([mid{+}1,\,right]\) with measures
+\[
+\phi(left,mid) = mid - left + 1 \;<\; right - left + 1 = \phi(left,right),
+\]
+\[
+\phi(mid{+}1,right) = right - mid \;<\; right - left + 1 = \phi(left,right).
+\]
+Hence each recursive call strictly decreases \(\phi\). Because \(\phi\) ranges over \(\mathbb{N}\) and decreases along recursion, there is no infinite descent; all recursion bottoms out and the algorithm terminates. (No measure is needed for \texttt{merge}, which is non-recursive.)
+
+\subsubsection*{Reflection \& Question}
+\textbf{Question.} What’s an example of a “bad” measure function that wouldn’t actually prove termination?
 %  end of semester work  
 
 
