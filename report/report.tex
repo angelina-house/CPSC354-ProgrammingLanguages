@@ -351,7 +351,151 @@ Hence each recursive call strictly decreases \(\phi\). Because \(\phi\) ranges o
 \textbf{Question.} What’s an example of a “bad” measure function that wouldn’t actually prove termination?
 %  end of semester work  
 
+\subsection{Week 5}\label{sec:week5}
+\smallskip
+\subsection*{Homework}
+Evaluate
+\[
+(\lambda f.\,\lambda x.\, f(f(x)))\;(\lambda f.\,\lambda x.\, f(f(f\,x))).
+\]
 
+\subsubsection*{Solution}
+Let \(A \equiv \lambda f.\lambda x.\, f(f(x))\) and \(B \equiv \lambda f.\lambda x.\, f(f(f\,x))\).
+
+\paragraph{Step 1.} Apply \(A\) to \(B\):
+\[
+A\,B \;\to_\beta\; \lambda x.\, B\,(B\,x).
+\]
+
+\paragraph{Step 2.} \(\alpha\)-rename inside \(B\) as \(B \equiv \lambda f.\lambda y.\, f(f(f\,y))\) and compute:
+\[
+B\,x \;=\; (\lambda f.\lambda y.\, f(f(f\,y)))\,x \;\to_\beta\; \lambda y.\, x(x(x\,y)).
+\]
+Write \(G \equiv \lambda y.\, x(x(x\,y))\). Then
+\[
+\lambda x.\, B\,(B\,x) \;=\; \lambda x.\, B\,G \;\to_\beta\; \lambda x.\, \lambda y.\, G\big(G(G\,y)\big).
+\]
+
+\paragraph{Step 3.} Unroll \(G\):
+\[
+G\,y = x^{3}(y),\qquad
+G(G\,y) = x^{6}(y),\qquad
+G\big(G(G\,y)\big) = x^{9}(y).
+\]
+
+\subsubsection*{Answer}
+\[
+\boxed{\lambda x.\,\lambda y.\, x(x(x(x(x(x(x(x(x\,y))))))))}
+\;=\;
+\lambda x.\lambda y.\, x^{9}(y).
+\]
+(Interpreting the terms as Church numerals, this is \(3^{2}=9\).)
+
+\paragraph{Remark.}
+The left term applies a function twice, the right term thrice; composing them yields ninefold application.
+
+\subsection{Week 6}\label{sec:week6}
+\smallskip
+\subsection*{Homework}
+Compute \texttt{fact 3} using the computation rules for \texttt{fix}, \texttt{let}, and \texttt{let rec}, and label each step with the rule used.
+
+\subsubsection*{Solution}
+We use the standard sugars/rules:
+\[
+\begin{aligned}
+&\texttt{fix } F \;\to\; (F\,(\texttt{fix } F)) \qquad
+&&\texttt{let } x = e_1 \text{ in } e_2 \;\to\; (\lambda x.\,e_2)\,e_1 \\
+&\texttt{let rec } f = e_1 \text{ in } e_2 \;\to\; \texttt{let } f = (\texttt{fix }(\lambda f.\,e_1)) \text{ in } e_2
+\end{aligned}
+\]
+and basic computation rules for conditionals and arithmetic:
+\[
+0=0 \to \texttt{True},\quad n{>}0 \Rightarrow (n=0) \to \texttt{False},\quad
+\texttt{if True then }A\texttt{ else }B \to A,\quad
+\texttt{if False then }A\texttt{ else }B \to B.
+\]
+For brevity, write
+\[
+F \;\stackrel{\mathrm{def}}{=}\; \lambda f.\,\lambda n.\; \texttt{if }(n=0)\texttt{ then }1\texttt{ else }n * f(n-1).
+\]
+
+\paragraph{Derivation (each step labeled).}
+\begin{align*}
+&\texttt{let rec fact = }\lambda n.\,\texttt{if }(n=0)\texttt{ then }1\texttt{ else }n * \texttt{fact }(n-1)\ \texttt{ in }\ \texttt{fact }3
+\\[2pt]
+&\xrightarrow{\text{def of \texttt{let rec}}}
+\texttt{let fact }= \texttt{fix }F\ \texttt{ in }\ \texttt{fact }3
+\\[2pt]
+&\xrightarrow{\text{def of \texttt{let}}}
+(\lambda \texttt{fact}.\ \texttt{fact }3)\ (\texttt{fix }F)
+\\[2pt]
+&\xrightarrow{\beta}
+(\texttt{fix }F)\ 3
+\\[2pt]
+&\xrightarrow{\text{def of \texttt{fix}}}
+(F\ (\texttt{fix }F))\ 3
+\\[2pt]
+&\xrightarrow{\beta}
+(\lambda n.\ \texttt{if }(n=0)\texttt{ then }1\texttt{ else }n * (\texttt{fix }F)(n-1))\ 3
+\\[2pt]
+&\xrightarrow{\beta}
+\texttt{if }(3=0)\texttt{ then }1\texttt{ else }3 * (\texttt{fix }F)(2)
+\\[2pt]
+&\xrightarrow{\text{arith/if}}
+3 * (\texttt{fix }F)(2)
+\\[6pt]
+&\textbf{Evaluate }(\texttt{fix }F)(2):
+\\[2pt]
+&(\texttt{fix }F)\ 2
+\xrightarrow{\text{def of \texttt{fix}}}
+(F\ (\texttt{fix }F))\ 2
+\xrightarrow{\beta}
+(\lambda n.\ \texttt{if }(n=0)\texttt{ then }1\texttt{ else }n * (\texttt{fix }F)(n-1))\ 2
+\\[2pt]
+&\xrightarrow{\beta}
+\texttt{if }(2=0)\texttt{ then }1\texttt{ else }2 * (\texttt{fix }F)(1)
+\xrightarrow{\text{arith/if}}
+2 * (\texttt{fix }F)(1)
+\\[6pt]
+&\textbf{Evaluate }(\texttt{fix }F)(1):
+\\[2pt]
+&(\texttt{fix }F)\ 1
+\xrightarrow{\text{def of \texttt{fix}}}
+(F\ (\texttt{fix }F))\ 1
+\xrightarrow{\beta}
+(\lambda n.\ \texttt{if }(n=0)\texttt{ then }1\texttt{ else }n * (\texttt{fix }F)(n-1))\ 1
+\\[2pt]
+&\xrightarrow{\beta}
+\texttt{if }(1=0)\texttt{ then }1\texttt{ else }1 * (\texttt{fix }F)(0)
+\xrightarrow{\text{arith/if}}
+1 * (\texttt{fix }F)(0)
+\\[6pt]
+&\textbf{Evaluate }(\texttt{fix }F)(0):
+\\[2pt]
+&(\texttt{fix }F)\ 0
+\xrightarrow{\text{def of \texttt{fix}}}
+(F\ (\texttt{fix }F))\ 0
+\xrightarrow{\beta}
+(\lambda n.\ \texttt{if }(n=0)\texttt{ then }1\texttt{ else }n * (\texttt{fix }F)(n-1))\ 0
+\\[2pt]
+&\xrightarrow{\beta}
+\texttt{if }(0=0)\texttt{ then }1\texttt{ else }0 * (\texttt{fix }F)(-1)
+\xrightarrow{\text{arith/if}}
+1
+\\[8pt]
+&\textbf{Back-substitute:}\quad
+1 * (\texttt{fix }F)(0) = 1 * 1 = 1,\quad
+2 * (\texttt{fix }F)(1) = 2 * 1 = 2,\quad
+3 * (\texttt{fix }F)(2) = 3 * 2 = 6.
+\end{align*}
+
+\subsubsection*{Answer}
+\[
+\boxed{\texttt{fact 3} \;\to\; 6}
+\]
+
+\subsubsection*{Reflection \& Question}
+\textbf{Question.} Could fix ever terminate incorrectly (or not at all) if the function has no base case?
 
 \section{Synthesis}
 
