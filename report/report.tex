@@ -3,6 +3,7 @@
 
 \usepackage{tikz} 
 \usepackage{tikz-cd}
+\usepackage[edges]{forest}
 \usetikzlibrary{automata, positioning, arrows} 
 
 \usepackage{array}
@@ -496,6 +497,260 @@ F \;\stackrel{\mathrm{def}}{=}\; \lambda f.\,\lambda n.\; \texttt{if }(n=0)\text
 
 \subsubsection*{Reflection \& Question}
 \textbf{Question.} Could fix ever terminate incorrectly (or not at all) if the function has no base case?
+
+\subsection{Week 7}\label{sec:week7}
+\smallskip
+\subsection*{Homework}
+\subsubsection*{Given Grammar}
+\[
+\begin{aligned}
+&\text{Exp} \;\to\; \text{Exp}~{+}~\text{Exp1}\ \mid\ \text{Exp1}\\
+&\text{Exp1} \;\to\; \text{Exp1}~{*}~\text{Exp2}\ \mid\ \text{Exp2}\\
+&\text{Exp2} \;\to\; \text{Integer}\ \mid\ (\text{Exp}) \qquad\text{(with Integer } \to \texttt{n})
+\end{aligned}
+\]
+
+\subsubsection*{Leftmost Derivations (quick checks)}
+\begin{align*}
+\textbf{2+1:}\quad
+&\text{Exp}\Rightarrow \text{Exp}+ \text{Exp1}\Rightarrow \text{Exp1}+ \text{Exp1}\Rightarrow \text{Exp2}+ \text{Exp1}
+\\[-2pt]&\Rightarrow \text{Integer}+ \text{Exp1}\Rightarrow \texttt{2}+ \text{Exp1}\Rightarrow \texttt{2}+ \text{Exp2}\Rightarrow \texttt{2}+ \text{Integer}\Rightarrow \texttt{2+1}.
+\\[4pt]
+\textbf{1+2*3:}\quad
+&\text{Exp}\Rightarrow \text{Exp}+ \text{Exp1}\Rightarrow \text{Exp1}+ \text{Exp1}\Rightarrow \text{Exp2}+ \text{Exp1}
+\\[-2pt]&\Rightarrow \text{Integer}+ (\text{Exp1}* \text{Exp2})\Rightarrow \texttt{1}+ (\text{Exp2}* \text{Exp2})
+\Rightarrow \texttt{1}+ (\text{Integer}* \text{Integer})\Rightarrow \texttt{1+2*3}.
+\\[4pt]
+\textbf{1+(2*3):}\quad
+&\text{Exp}\Rightarrow \text{Exp}+ \text{Exp1}\Rightarrow \text{Exp1}+ \text{Exp1}\Rightarrow \text{Exp2}+ \text{Exp1}\Rightarrow \text{Integer}+ \text{Exp1}
+\\[-2pt]&\Rightarrow \texttt{1}+ \text{Exp2}\Rightarrow \texttt{1}+(\text{Exp})\Rightarrow \texttt{1}+(\text{Exp1}* \text{Exp2})
+\Rightarrow \texttt{1}+(\text{Integer}* \text{Integer})\Rightarrow \texttt{1+(2*3)}.
+\\[4pt]
+\textbf{(1+2)*3:}\quad
+&\text{Exp}\Rightarrow \text{Exp1}\Rightarrow \text{Exp1}* \text{Exp2}\Rightarrow \text{Exp2}* \text{Exp2}\Rightarrow (\text{Exp})* \text{Integer}
+\\[-2pt]&\Rightarrow (\text{Exp}+ \text{Exp1})* \texttt{3}\Rightarrow (\text{Exp1}+ \text{Exp1})* \texttt{3}\Rightarrow (\text{Integer}+ \text{Integer})* \texttt{3}\Rightarrow \texttt{(1+2)*3}.
+\\[4pt]
+\textbf{1+2*3+4*5+6:}\quad
+&\text{Exp}\Rightarrow \text{Exp}+ \text{Exp1}\Rightarrow (\text{Exp}+ \text{Exp1})+ \text{Exp1}\Rightarrow ((\text{Exp}+ \text{Exp1})+ \text{Exp1})+ \text{Exp1}
+\\[-2pt]&\text{and expand each }\text{Exp1}\text{ with } \text{Exp1}\to \text{Exp1}* \text{Exp2} \text{ as needed.}
+\end{align*}
+
+\subsubsection*{Parse Trees}
+% 2 + 1
+\begin{forest}
+for tree={align=center, grow'=south, parent anchor=south, child anchor=north}
+[Exp
+  [Exp1
+    [Exp2
+      [Integer [\texttt{2}]]
+    ]
+  ]
+  [\texttt{+}]
+  [Exp1
+    [Exp2
+      [Integer [\texttt{1}]]
+    ]
+  ]
+]
+\end{forest}
+
+\bigskip
+
+% 1 + 2*3
+\begin{forest}
+for tree={align=center, grow'=south, parent anchor=south, child anchor=north}
+[Exp
+  [Exp1
+    [Exp2
+      [Integer [\texttt{1}]]
+    ]
+  ]
+  [\texttt{+}]
+  [Exp1
+    [Exp1
+      [Exp2
+        [Integer [\texttt{2}]]
+      ]
+    ]
+    [\texttt{*}]
+    [Exp2
+      [Integer [\texttt{3}]]
+    ]
+  ]
+]
+\end{forest}
+
+\bigskip
+
+% 1 + (2*3)
+\begin{forest}
+for tree={align=center, grow'=south, parent anchor=south, child anchor=north}
+[Exp
+  [Exp1
+    [Exp2
+      [Integer [\texttt{1}]]
+    ]
+  ]
+  [\texttt{+}]
+  [Exp1
+    [Exp2
+      [\texttt{(}]
+      [Exp
+        [Exp1
+          [Exp1
+            [Exp2
+              [Integer [\texttt{2}]]
+            ]
+          ]
+          [\texttt{*}]
+          [Exp2
+            [Integer [\texttt{3}]]
+          ]
+        ]
+      ]
+      [\texttt{)}]
+    ]
+  ]
+]
+\end{forest}
+
+\bigskip
+
+% (1+2) * 3
+\begin{forest}
+for tree={align=center, grow'=south, parent anchor=south, child anchor=north}
+[Exp
+  [Exp1
+    [Exp1
+      [Exp2
+        [\texttt{(}]
+        [Exp
+          [Exp
+            [Exp1
+              [Exp2
+                [Integer [\texttt{1}]]
+              ]
+            ]
+          ]
+          [\texttt{+}]
+          [Exp1
+            [Exp2
+              [Integer [\texttt{2}]]
+            ]
+          ]
+        ]
+        [\texttt{)}]
+      ]
+    ]
+    [\texttt{*}]
+    [Exp2
+      [Integer [\texttt{3}]]
+    ]
+  ]
+]
+\end{forest}
+
+\bigskip
+
+% 1 + 2*3 + 4*5 + 6
+\begin{forest}
+for tree={align=center, grow'=south, parent anchor=south, child anchor=north}
+[Exp
+  [Exp
+    [Exp
+      [Exp1
+        [Exp2
+          [Integer [\texttt{1}]]
+        ]
+      ]
+      [\texttt{+}]
+      [Exp1
+        [Exp1
+          [Exp2
+            [Integer [\texttt{2}]]
+          ]
+        ]
+        [\texttt{*}]
+        [Exp2
+          [Integer [\texttt{3}]]
+        ]
+      ]
+    ]
+    [\texttt{+}]
+    [Exp1
+      [Exp1
+        [Exp2
+          [Integer [\texttt{4}]]
+        ]
+      ]
+      [\texttt{*}]
+      [Exp2
+        [Integer [\texttt{5}]]
+      ]
+    ]
+  ]
+  [\texttt{+}]
+  [Exp1
+    [Exp2
+      [Integer [\texttt{6}]]
+    ]
+  ]
+]
+\end{forest}
+
+\subsection{Week 8}\label{sec:week8}
+\smallskip
+\subsection*{Homework}
+Finished \emph{Tutorial World} (NNG4). Below are my tactic scripts for Levels 5–8 and a matching English proof for Level 8.
+
+\subsubsection*{NNG Tutorial World — Solutions (Levels 5–8)}
+\begin{lstlisting}
+-- Level 5: Adding zero
+rw [add_zero b]
+rw [add_zero c]
+rfl
+
+-- Level 6: Precision rewriting (same goal shape but focused rewrites)
+rw [add_zero b]
+rw [add_zero c]
+rfl
+
+-- Level 7: add_succ
+rw [one_eq_succ_zero]
+rw [add_succ]
+rw [add_zero]
+rfl
+
+-- Level 8: 2 + 2 = 4
+nth_rewrite 2 [two_eq_succ_one]
+rw [add_succ 2]
+nth_rewrite 1 [one_eq_succ_zero]
+rw [add_succ 2]
+rw [add_zero 2]
+rw [← three_eq_succ_two]
+rw [← four_eq_succ_three]
+rfl
+\end{lstlisting}
+
+\subsubsection*{Natural-language proof for Level 8 (\(2+2=4\))}
+We use Peano naturals where \(\mathrm{succ}(n)\) is the successor, and
+\[
+0,\quad 1=\mathrm{succ}(0),\quad 2=\mathrm{succ}(1),\quad
+3=\mathrm{succ}(2),\quad 4=\mathrm{succ}(3).
+\]
+Addition is defined by \(a+0=a\) and \(a+\mathrm{succ}(b)=\mathrm{succ}(a+b)\).
+Then:
+\[
+\begin{aligned}
+2+2
+&= 2+\mathrm{succ}(1) &&\text{(since \(2=\mathrm{succ}(1)\))}\\
+&= \mathrm{succ}(2+1) &&\text{(def.\ of addition)}\\
+&= \mathrm{succ}\big(2+\mathrm{succ}(0)\big) &&\text{(since \(1=\mathrm{succ}(0)\))}\\
+&= \mathrm{succ}\big(\mathrm{succ}(2+0)\big) &&\text{(def.\ of addition)}\\
+&= \mathrm{succ}\big(\mathrm{succ}(2)\big) &&\text{(since \(2+0=2\))}\\
+&= \mathrm{succ}(3) = 4. &&\qedhere
+\end{aligned}
+\]
 
 \section{Synthesis}
 
