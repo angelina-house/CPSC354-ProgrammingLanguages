@@ -752,6 +752,91 @@ Then:
 \end{aligned}
 \]
 
+\subsection{Week 9}\label{sec:week9}
+\smallskip
+\subsection*{Homework}
+From \emph{NNG4 Addition World}, complete Level 5 and provide two Lean solutions for
+\[
+\texttt{add\_right\_comm} : \ \forall a b c : \mathbb{N},\ a+b+c = a+c+b,
+\]
+one \emph{without induction} and one \emph{with induction}. For each, include a corresponding pen-and-paper proof.
+
+\subsubsection*{Level 5 — Statement}
+\begin{theorem}[Right-commutativity of addition]
+For all $a,b,c\in\mathbb N$, \; $a+b+c = a+c+b$.
+\end{theorem}
+
+\subsubsection*{Lean solution (without induction)}
+\begin{lstlisting}
+-- Using only associativity and commutativity of +
+theorem add_right_comm (a b c : ℕ) : a + b + c = a + c + b := by
+  -- a + b + c = a + (b + c)
+  rw [add_assoc]
+  -- a + (b + c) = a + (c + b)
+  rw [add_comm b c]
+  -- a + (c + b) = a + c + b
+  rw [add_assoc]
+\end{lstlisting}
+
+\subsubsection*{Pen-and-paper proof (corresponding to the non-inductive Lean script)}
+We use associativity and commutativity of $+$ on $\mathbb N$:
+\[
+\begin{aligned}
+a+b+c &= a+(b+c) &&\text{(associativity)}\\
+      &= a+(c+b) &&\text{(commutativity)}\\
+      &= a+c+b   &&\text{(associativity).}
+\end{aligned}
+\]
+Thus $a+b+c=a+c+b$.
+
+\subsubsection*{Lean solution (with induction on \(b\))}
+\begin{lstlisting}
+theorem add_right_comm (a b c : ℕ) : a + b + c = a + c + b := by
+  induction b with
+  | zero =>
+      -- goal: a + 0 + c = a + c + 0
+      rw [add_zero, add_zero]
+      rfl
+  | succ d ih =>
+      -- goal: a + succ d + c = a + c + succ d
+      -- expose the IH by rewriting both sides
+      rw [add_succ]        -- a + succ d + c = succ (a + d) + c
+      rw [succ_add]        -- succ (a + d) + c = succ ((a + d) + c)
+      rw [ih]              -- succ ((a + c) + d)
+      rw [add_succ]        -- a + c + succ d = succ ((a + c) + d)
+      rfl
+\end{lstlisting}
+
+\subsubsection*{Pen-and-paper proof (corresponding to the inductive Lean script)}
+\textbf{Claim.} For all $a,c\in\mathbb N$ and all $b\in\mathbb N$, we have $a+b+c=a+c+b$.
+
+\emph{Base case $b=0$.} Using $x+0=x$,
+\[
+a+0+c = a+c = a+c+0.
+\]
+
+\emph{Inductive step.} Suppose $a+d+c=a+c+d$ for some $d$ (induction hypothesis). Using the successor laws
+\[
+x+(y+1)=(x+y)+1 \quad\text{and}\quad (x+1)+y=(x+y)+1,
+\]
+we compute
+\[
+\begin{aligned}
+a+(d+1)+c
+&= (a+d+1)+c
+ = (a+d+c)+1
+\\&= (a+c+d)+1 \qquad\text{(by IH)}
+\\&= (a+c)+(d+1)
+= a+c+(d+1).
+\end{aligned}
+\]
+Hence the property holds for $d+1$, and by induction it holds for all $b\in\mathbb N$. \qed
+
+\subsubsection*{Reflection \& Question}
+\textbf{Question.} Could we use pattern matching on b instead of induction to do the same proof?
+
+
+
 \section{Synthesis}
 
 
