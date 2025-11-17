@@ -835,7 +835,163 @@ Hence the property holds for $d+1$, and by induction it holds for all $b\in\math
 \subsubsection*{Reflection \& Question}
 \textbf{Question.} Could we use pattern matching on b instead of induction to do the same proof?
 
+\subsection{Week 10}\label{sec:week10}
+\smallskip
+\subsection*{Homework}
+Work through the “Party Snacks" implication tutorial in the Lean Logic Game and provide single‑line solutions for Levels 6–9.
 
+\subsubsection*{Lean Solutions (Levels 6–9)}
+\begin{lstlisting}
+-- Level 6
+fun h c d => h ⟨c, d⟩
+
+-- Level 7
+fun h cd => h cd.left cd.right
+
+-- Level 8
+fun h s => ⟨(h s).left, (h s).right⟩
+
+-- Level 9
+fun r => ⟨(fun _ : S => r), (fun _ : ¬ S => r)⟩
+\end{lstlisting}
+
+\subsubsection*{Brief Explanation}
+Each solution follows directly from the Curry–Howard correspondence:
+\begin{itemize}
+  \item Level 6 converts a function on pairs into a curried function.
+  \item Level 7 does the reverse: it consumes a pair and applies each projection.
+  \item Level 8 takes an implication into a conjunction and splits it.
+  \item Level 9 builds both branches of a conjunction from a single proof of \(R\).
+\end{itemize}
+
+\subsubsection*{Reflection \& Question}
+\textbf{Reflection.}  
+These levels reinforced that implication is just function type and conjunction is a product type. Once I rewrote each goal as a function type, the correct lambda term became much easier to see.
+
+\textbf{Question.}  
+In the Party Snacks tutorial, is there a systematic way (using Curry–Howard) to derive lambda terms directly from the goal type, or does this mostly come from practice and pattern recognition?
+
+\subsection{Week 12}\label{sec:week12}
+\smallskip
+\subsection*{Homework}
+Solve the first three items of the Towers of Hanoi activity:
+\begin{enumerate}
+  \item Complete the execution trace of \texttt{hanoi 5 0 2} (fill in the dots).
+  \item Extract from the execution the moves that solve the puzzle (in the right order).
+  \item Verify the execution by checking it against an online Towers of Hanoi game.
+\end{enumerate}
+
+\subsubsection*{Completed Execution Trace for \texttt{hanoi 5 0 2}}
+
+Below is the full stack-style execution trace, written line by line as in the note (each line shows the current top of the stack):
+
+\begin{lstlisting}
+hanoi 5 0 2
+hanoi 4 0 1
+hanoi 3 0 2
+hanoi 2 0 1
+hanoi 1 0 2
+move 0 2
+move 0 1
+hanoi 1 2 1
+move 2 1
+move 0 2
+hanoi 2 1 2
+hanoi 1 1 0
+move 1 0
+move 1 2
+hanoi 1 0 2
+move 0 2
+move 0 1
+hanoi 3 2 1
+hanoi 2 2 0
+hanoi 1 2 1
+move 2 1
+move 2 0
+hanoi 1 1 0
+move 1 0
+move 2 1
+hanoi 2 0 1
+hanoi 1 0 2
+move 0 2
+move 0 1
+hanoi 1 2 1
+move 2 1
+move 0 2
+hanoi 4 1 2
+hanoi 3 1 0
+hanoi 2 1 2
+hanoi 1 1 0
+move 1 0
+move 1 2
+hanoi 1 0 2
+move 0 2
+move 1 0
+hanoi 2 2 0
+hanoi 1 2 1
+move 2 1
+move 2 0
+hanoi 1 1 0
+move 1 0
+move 1 2
+hanoi 3 0 2
+hanoi 2 0 1
+hanoi 1 0 2
+move 0 2
+move 0 1
+hanoi 1 2 1
+move 2 1
+move 0 2
+hanoi 2 1 2
+hanoi 1 1 0
+move 1 0
+move 1 2
+hanoi 1 0 2
+move 0 2
+\end{lstlisting}
+
+\subsubsection*{Moves Extracted from the Trace}
+
+From this trace, the actual moves of the puzzle are the lines beginning with \texttt{move}. There are \(2^5 - 1 = 31\) moves:
+
+\begin{lstlisting}
+move 0 2
+move 0 1
+move 2 1
+move 0 2
+move 1 0
+move 1 2
+move 0 2
+move 0 1
+move 2 1
+move 2 0
+move 1 0
+move 2 1
+move 0 2
+move 0 1
+move 2 1
+move 0 2
+move 1 0
+move 1 2
+move 0 2
+move 1 0
+move 2 1
+move 2 0
+move 1 0
+move 1 2
+move 0 2
+move 0 1
+move 2 1
+move 0 2
+move 1 0
+move 1 2
+move 0 2
+\end{lstlisting}
+
+Interpreting \texttt{move x y} as “move the top disk from peg \(x\) to peg \(y\),” following these 31 moves on the online Towers of Hanoi game for \(n=5\) correctly transfers the whole tower from peg 0 to peg 2 without ever putting a larger disk on a smaller one.
+
+\textbf{Discord Question.}  
+From this execution trace it looks like both the number of moves and the number of \texttt{hanoi} calls for \(n\) disks are \(2^n - 1\). Is there a clean structural argument (using the recursion rules for \texttt{hanoi}) that shows these counts are always \(2^n - 1\), without having to write out the whole trace?
 
 \section{Synthesis}
 
