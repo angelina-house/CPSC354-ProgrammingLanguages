@@ -993,6 +993,164 @@ Interpreting \texttt{move x y} as “move the top disk from peg \(x\) to peg \(y
 \textbf{Discord Question.}  
 From this execution trace it looks like both the number of moves and the number of \texttt{hanoi} calls for \(n\) disks are \(2^n - 1\). Is there a clean structural argument (using the recursion rules for \texttt{hanoi}) that shows these counts are always \(2^n - 1\), without having to write out the whole trace?
 
+
+
+
+\subsection{Week 13}\label{sec:week13}
+\smallskip
+\subsection*{Homework}
+Work through Items 2--8 of the online handout \emph{Lambda Calculus in Python (2025)} \url{https://hackmd.io/@alexhkurz/B1FMhwc1bg} using the Python interpreter \texttt{interpreter.py} from \texttt{lambdaC-2024}. Summarize your experiments and traces.
+
+\subsubsection*{Item 2 --- Extra Tests in \texttt{test.lc}}
+I added a few lambda-terms to \texttt{test.lc}, always predicting the normal form before running the interpreter. For each program, the interpreter output matched the expected result.
+
+\paragraph{Parentheses and associativity.}
+By convention, application associates to the left, so
+\[
+a\,b\,c\,d \quad\text{is short for}\quad (((a\,b)\,c)\,d).
+\]
+In the concrete syntax of the interpreter this is written as \texttt{a b c d}, and the fully parenthesized form that the interpreter uses internally is
+\[
+(((a\,b)\,c)\,d).
+\]
+Similarly, a single pair of parentheses does nothing:
+\[
+(a) \rightsquigarrow a.
+\]
+So I expected
+\[
+\texttt{a b c d} \to (((a\,b)\,c)\,d) \qquad\text{and}\qquad (a) \to a.
+\]
+Running the interpreter confirmed these expectations.
+
+\paragraph{Composed Church numerals.}
+From Homework 5 we know that
+\[
+(\lambda f.\lambda x.\,f(f(x)))\;(\lambda f.\lambda x.\,f(f(f\,x)))
+\]
+is the composition of ``apply twice'' with ``apply three times.'' Writing
+\[
+\mathbf{2} \;\equiv\; \lambda f.\lambda x.\, f(f(x)), \qquad
+\mathbf{3} \;\equiv\; \lambda f.\lambda x.\, f(f(f(x))),
+\]
+the term \(\mathbf{2}\,\mathbf{3}\) should behave like the Church numeral for \(3^2=9\):
+\[
+\mathbf{2}\,\mathbf{3}\;\equiv\;\lambda x.\,\mathbf{3}(\mathbf{3}\,x)
+\;\equiv\; \lambda f.\lambda x.\, f^{9}(x),
+\]
+where \(f^{9}\) means ninefold iteration of \(f\). The interpreter indeed reduces the program to a lambda-term of the form
+\[
+\lambda f.\lambda x.\, f(f(f(f(f(f(f(f(f\,x)))))))).
+\]
+
+\subsubsection*{Item 3 --- How Capture-Avoiding Substitution Works}
+Conceptually, substitution \([N/x]M\) replaces all free occurrences of \(x\) in \(M\) by \(N\), while avoiding variable capture.
+
+In the Python interpreter this is implemented structurally on the abstract syntax tree:
+\begin{itemize}
+  \item Variables are represented by a small \texttt{Var} node with a name.
+  \item Lambda abstractions are nodes \texttt{Abs(name, body)}.
+  \item Applications are nodes \texttt{App(func, arg)}.
+\end{itemize}
+Substitution is a recursive function \texttt{substitute(term, name, argument)}:
+\begin{itemize}
+  \item For a variable node \texttt{x}:
+    \begin{itemize}
+      \item If \texttt{x.name == name}, return the argument term.
+      \item Otherwise return \texttt{x} unchanged.
+    \end{itemize}
+  \item For an application \texttt{App(M,N)}, recursively substitute into both \texttt{M} and \texttt{N}.
+  \item For an abstraction \texttt{Abs(x,M)}:
+    \begin{itemize}
+      \item If \texttt{x == name}, the bound parameter shadows the name, so do nothing under this binder and return \texttt{Abs(x,M)}.
+      \item Otherwise, compute the free variables of the argument. If \texttt{x} appears free in the argument, generate a fresh name \texttt{y} (e.g.\ \texttt{Var1}, \texttt{Var2}, \dots), rename the binder and its bound occurrences in \texttt{M} to \texttt{y}, and then continue the substitution in the renamed body.
+      \item If there is no clash, recursively substitute into the body.
+    \end{itemize}
+\end{itemize}
+So capture-avoidance is enforced by renaming binders just before they might capture a free variable in the argument. This matches the mathematical picture from lecture: we are always free to \(\alpha\)-rename bound variables so that the \(\beta\)-reduction step \( (\lambda x.M)\,N \to M[N/x]\) does not change the meaning of the program.
+
+\subsubsection*{Item 4 --- Expected Results and Normal Forms}
+For all test programs built from Church numerals, Church Booleans, and simple combinators, the interpreter produced the expected normal forms:
+\begin{itemize}
+  \item Church arithmetic (successor, addition, multiplication) behaves as specified on small numerals.
+  \item The boolean encodings \(\mathsf{true} \equiv \lambda x.\lambda y.x\) and \(\mathsf{false} \equiv \lambda x.\lambda y.y\) correctly control conditional-like terms.
+  \item The numerical example from Item~2 reduces to the Church numeral for \(9\).
+\end{itemize}
+However, not \emph{all} lambda-terms reduce to normal form. For self-application terms like
+\[
+\Omega \;\equiv\; (\lambda x.\, x\,x)\,(\lambda x.\, x\,x)
+\]
+the interpreter keeps reducing forever: each step recreates the same redex. This demonstrates the general fact that the untyped lambda calculus is Turing complete and has non-terminating programs.
+
+\subsubsection*{Item 5 --- A Minimal Non-Normalizing Example}
+A classic minimal working example (MWE) of a lambda-term without normal form is
+\[
+\Omega \;\equiv\; (\lambda x.\, x\,x)\,(\lambda x.\, x\,x).
+\]
+A single \(\lambda\)-abstraction, such as \(\lambda x.x\), is already in normal form. Any application \(M\,N\) with smaller subterms \(M,N\) either reduces to a smaller term or normalizes quickly. In contrast, \(\Omega\) reduces to itself:
+\[
+(\lambda x.\, x\,x)\,(\lambda x.\, x\,x) \;\to_\beta\;
+(\lambda x.\, x\,x)\,(\lambda x.\, x\,x),
+\]
+so the reduction sequence never terminates. My expectation (confirmed by the interpreter) is that evaluating \(\Omega\) loops forever.
+
+\subsubsection*{Item 7 --- Substitution Trace for \(((\lambda m.\lambda n.\, m\,n)\,M)\,N\)}
+Here
+\[
+M \equiv \lambda f.\lambda x.\, f(f(x)),\qquad
+N \equiv \lambda f.\lambda x.\, f(f(f(x))).
+\]
+Following the interpreter, we write one line per substitution step, including the fresh variable names introduced by capture-avoiding substitution. A typical linear trace (omitting irrelevant parentheses) looks like:
+\begin{lstlisting}
+((\m.\n. m n) M) N
+((\Var1. M Var1) ) N                -- substitute M for m, rename n to Var1
+M N
+(\f.\x. f (f x)) N
+(\x. N (N x))
+(\x. (\f.\x. f (f (f x))) (N x))
+(\x. (\x. (N x) (N x)))             -- after simplifying N (N x)
+\end{lstlisting}
+Expanding \(N\) and carrying out the remaining substitutions gives the normal form
+\[
+\lambda f.\lambda x.\, f^{9}(x),
+\]
+which is the Church numeral for \(9\), in agreement with the mathematical calculation from Week~\ref{sec:week5}.
+
+\subsubsection*{Item 8 --- Recursive Trace of \texttt{evaluate} and \texttt{substitute}}
+For the input
+\[
+((\lambda m.\lambda n.\, m\,n)\,(\lambda f.\lambda x.\, f(f(x))))\,
+(\lambda f.\lambda x.\, f(x)),
+\]
+the top-level call is something like:
+\begin{lstlisting}
+12: eval (((\m.(\n.(m n))) (\f.(\x.(f (f x))))) (\f.(\x.(f x))))
+\end{lstlisting}
+The interpreter then recursively evaluates the function and argument parts and performs substitutions. A schematic recursive trace (only calls to \texttt{evaluate} and the outermost calls to \texttt{substitute}) is:
+\begin{lstlisting}
+12: eval (((\m.(\n.(m n))) M) N)
+ 24: eval ((\m.(\n.(m n))) M)
+  31: eval (\m.(\n.(m n)))
+  38: eval M
+  45: substitute(m := M) in (\n.(m n))
+  46: eval (\n.(M n))
+ 58: eval N
+ 66: substitute(n := N) in (M n)
+ 67: eval (M N)
+  75: eval M
+  82: eval N
+  90: substitute(f := N) in (\x. f (f x))
+  91: eval (\x. N (N x))
+\end{lstlisting}
+The final result of evaluation is the normal form of \(M\,N\), which simplifies to the self-application combinator
+\[
+\lambda x.\, x\,x.
+\]
+This matches the behaviour predicted by the mathematical \(\beta\)-reduction rules: the outer combinator \((\lambda m.\lambda n.\,m n)\) simply passes its two arguments to each other, leaving us with \(M\,N\), and further reductions collapse to \(\lambda x.\,x x\).
+
+\subsubsection*{Question}
+Are there interesting lambda terms that do have a normal form, but our particular evaluation strategy still loops on them?
+
 \section{Synthesis}
 
 
