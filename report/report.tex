@@ -1153,15 +1153,78 @@ Are there interesting lambda terms that do have a normal form, but our particula
 
 \section{Synthesis}
 
+Over the course of this semester, my understanding of what ``programming languages'' actually means changed a lot. At the beginning, I mostly thought of programming languages as tools for writing code that runs on a computer. By the end of the course, I started thinking of programs as mathematical objects that can be reasoned about, analyzed, and even proven correct or incorrect without ever running them. A big theme throughout the class was that computation is not just something you observe by executing code, but something you can understand using formal systems, rules, and proofs.
+
+The MU puzzle from the first week set the tone for the rest of the semester. At first, it feels like a simple game of symbol manipulation where you just keep applying rules and hope to reach the string \texttt{MU}. What surprised me was that the actual solution was not about finding the right sequence of steps, but about realizing that it is impossible by looking at an invariant. That idea of stepping outside the system to reason about what is possible kept coming up again later in the course. Instead of getting stuck trying more and more steps, we learned to ask bigger questions about the structure of the system itself.
+
+This idea showed up again when we studied abstract reduction systems and rewriting. Concepts like termination, confluence, and unique normal forms gave me a way to talk about why some systems behave nicely and others do not. If a system is terminating and confluent, then computation feels predictable: no matter how you reduce an expression, you end up in the same place. Once those properties fail, you can get infinite loops or multiple possible results. This made me realize that evaluation strategies in programming languages are not arbitrary, but are deeply connected to these mathematical properties.
+
+Termination proofs in Week 4 also changed how I think about algorithms and recursion. Before this class, I usually accepted that recursive algorithms like merge sort or Euclid’s algorithm terminate because I had seen them work. Writing an actual termination proof using a measure function made it clear that termination is something you have to justify, not assume. It also helped me understand why recursive definitions in programming languages need to be well-structured: without a decreasing measure, recursion can easily lead to non-termination.
+
+The weeks on lambda calculus, especially the reduction exercises and the Python interpreter, tied many of these ideas together. Evaluating lambda terms felt very similar to the rewriting systems we studied earlier, except now the rules directly represented computation. Seeing how substitution works in practice, especially capture-avoiding substitution, helped me understand why variable renaming and $\alpha$-equivalence matter so much. The fact that some lambda terms, like $\Omega$, never terminate made the idea of non-termination very concrete and connected back to earlier discussions of infinite reduction sequences.
+
+Working with Lean in the Natural Number Game and the Logic Game was also an important part of my learning. Writing proofs as code forced me to be precise in a way that informal math does not. At the same time, it was interesting to see how closely the Lean proofs matched the pen-and-paper reasoning once I understood the underlying ideas. The Curry–Howard correspondence, in particular, helped me see that logical statements and function types are really two sides of the same concept.
+
+Overall, this course changed how I think about both programming and mathematics. I am now much more aware of the assumptions behind computation, such as termination, determinism, and correctness. Even when writing ordinary code, I find myself thinking about invariants, measures, and reduction rules. While many of the systems we studied were small and abstract, they gave me tools and ways of thinking that apply to real programming languages and real programs.
+
 
 \section{Evidence of Participation}
+
+In addition to completing weekly homework and in-class activities, I engaged with course-related material outside of class by listening to and reflecting on podcasts that discuss topics closely related to programming languages, computation, and formal reasoning.
+
+\subsection*{Podcast Engagement}
+
+\begin{itemize}
+  \item \textbf{Lex Fridman Podcast} — Episodes discussing programming languages, computation, and artificial intelligence, particularly conversations with researchers working on formal methods and theoretical computer science.
+  \item \textbf{Software Engineering Daily} — Episodes focused on language design, interpreters, and how high-level programming concepts are implemented in practice.
+  \item \textbf{Talk Python to Me} — Episodes covering functional programming, recursion, and the design of language features in Python.
+\end{itemize}
+
+\subsection*{Reflection}
+
+Listening to these podcasts helped reinforce many of the abstract ideas from class by connecting them to real-world discussions among researchers and engineers. Topics like recursion, language design tradeoffs, and reasoning about program behavior came up repeatedly and closely matched what we studied through formal systems, rewriting rules, and lambda calculus. In particular, hearing practitioners talk about why certain language features exist made the theoretical material feel more grounded and helped me better understand why formal reasoning about programs matters beyond homework exercises.
 
 
 \section{Conclusion}\label{conclusion}
 
+Overall, this class changed the way I think about programming. I used to mostly judge code by whether it runs and gives the right output, but now I pay a lot more attention to \emph{why} it works and what assumptions are hiding underneath it. Topics like invariants, reduction systems, and termination made me realize that a lot of “debugging” and “understanding code” is really about reasoning in a structured way, not just trying random fixes.
+
+One of the most useful takeaways for me was learning how to explain computation step-by-step. Whether it was doing $\beta$-reductions in lambda calculus, proving termination using a measure function, or writing Lean proofs that force you to be precise, the main skill I practiced was turning a messy process into clear steps that someone else could follow. Even when something felt tedious (like writing out traces), it made the logic behind the result way more convincing.
+
+If I keep building on anything from this course, it will be this habit of looking for the “big idea” behind a problem: an invariant, a normal form, a proof strategy, or a definition that makes the whole situation easier to understand. I feel like that mindset will help in future CS classes, especially anything involving algorithms, theory, compilers, or security, because it pushes you to focus on correctness and structure instead of just results.
+
 
 \begin{thebibliography}{99}
 
+  \bibitem{hofstadter1979}
+  Hofstadter, Douglas R. \emph{Gödel, Escher, Bach: An Eternal Golden Braid}. Basic Books, 1979.
+  
+  \bibitem{pierce2002}
+  Pierce, Benjamin C. \emph{Types and Programming Languages}. MIT Press, 2002.
+  
+  \bibitem{barendregt1984}
+  Barendregt, Henk P. \emph{The Lambda Calculus: Its Syntax and Semantics}. Revised ed., North-Holland, 1984.
+  
+  \bibitem{winskel1993}
+  Winskel, Glynn. \emph{The Formal Semantics of Programming Languages: An Introduction}. MIT Press, 1993.
+  
+  \bibitem{baader_nipkow1998}
+  Baader, Franz, and Tobias Nipkow. \emph{Term Rewriting and All That}. Cambridge University Press, 1998.
+  
+  \bibitem{terese2003}
+  Terese. \emph{Term Rewriting Systems}. Cambridge University Press, 2003.
+  
+  \bibitem{sipser2012}
+  Sipser, Michael. \emph{Introduction to the Theory of Computation}. 3rd ed., Cengage Learning, 2012.
+  
+  \bibitem{deMouraLean2015}
+  de Moura, Leonardo, Soonho Kong, Jeremy Avigad, Floris van Doorn, and Jakob von Raumer. ``The Lean Theorem Prover (System Description).'' \emph{Proceedings of the 25th International Conference on Automated Deduction (CADE-25)}, Springer, 2015, pp.\ 378--388.
+  
+  \bibitem{wadler2015}
+  Wadler, Philip. ``Propositions as Types.'' \emph{Communications of the ACM}, vol.\ 58, no.\ 12, 2015, pp.\ 75--84.
+  
+  \bibitem{hutton2016}
+  Hutton, Graham. \emph{Programming in Haskell}. 2nd ed., Cambridge University Press, 2016.
 
 \end{thebibliography}
 
